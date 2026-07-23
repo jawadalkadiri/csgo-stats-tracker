@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<header></header>
+<body>
+
+    <form id="playerForm">
+        <input type="text" name="playerId" id="playerId" placeholder="Enter Player ID">
+        <button type="submit">Get Player Info</button>
+    </form>
+    <button id="getOld">Get History Of Searchs</button>
+
+
+    <div id="playerInfo"></div>
+    <div id="oldHistory"></div>
+    <script>
+        let playerForm = document.getElementById("playerForm");
+        const historyBtn = document.getElementById("getOld");
+
+        
+
+        playerForm.addEventListener("submit",async function(e){
+                e.preventDefault()
+                const playerId = document.getElementById("playerId").value;
+
+                
+                const res = await fetch(`http://localhost:3001/api/stats/${playerId}`)
+                const data = await res.json()
+                console.log(data);
+                const stats = data.playerstats.stats
+                const kills = stats.find(s => s.name === "total_kills").value;
+                const deaths = stats.find(s => s.name === "total_deaths").value;
+//console.log(kills);
+                //console.log(deaths)
+                //console.log(stats);
+
+                
+
+                document.getElementById("playerInfo").innerHTML = `<h1>Player Kills: ${kills}</h1>    
+                                            <h1>Player Deaths: ${deaths}</h1>    
+                                            <h1>K/D: ${(kills / deaths).toFixed(2)}</h1>                        
+                
+                `
+            }
+        )
+
+        historyBtn.addEventListener("click",async function(e){
+            const res = await fetch(`http://localhost:3001/api/history`)
+            const data = await res.json()
+            console.log(data);
+            const rows = data.map(entry => ` <p>${entry.steamid} — Kills: ${entry.kills}, 
+                Deaths: ${entry.deaths}</p>
+                 `).join("");
+        document.getElementById("oldHistory").innerHTML = rows
+        })
+        
+
+        
+        
+   </script>
+</body>
