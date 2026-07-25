@@ -1,59 +1,421 @@
 <!DOCTYPE html>
-<header></header>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CS:GO Stats Tracker</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" />
+    <style>
+        /* ─── Reset & Base ─── */
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            background: #0f0f11;
+            background-image:
+                radial-gradient(ellipse at 20% 50%, rgba(255, 140, 0, 0.04) 0%, transparent 60%),
+                radial-gradient(ellipse at 80% 50%, rgba(255, 200, 0, 0.03) 0%, transparent 60%);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+        }
+
+        /* ─── Header ─── */
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .header h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 4px;
+            background: linear-gradient(135deg, #ff8c00, #ffcc00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header p {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 0.4rem;
+            letter-spacing: 1px;
+        }
+
+        /* ─── Container ─── */
+        .container {
+            width: 100%;
+            max-width: 680px;
+        }
+
+        /* ─── Search Card ─── */
+        .search-card {
+            background: #1a1a20;
+            border: 1px solid #2a2a32;
+            border-radius: 16px;
+            padding: 1.5rem 1.8rem;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+            margin-bottom: 1.8rem;
+        }
+
+        .search-card label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: #ff8c00;
+            margin-bottom: 0.6rem;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 0.6rem;
+        }
+
+        .input-group input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid #2a2a32;
+            border-radius: 10px;
+            background: #121216;
+            color: #e0e0e0;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.25s, box-shadow 0.25s;
+        }
+
+        .input-group input::placeholder {
+            color: #555;
+        }
+
+        .input-group input:focus {
+            border-color: #ff8c00;
+            box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.15);
+        }
+
+        .input-group button {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #ff8c00, #e67600);
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            white-space: nowrap;
+        }
+
+        .input-group button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(255, 140, 0, 0.35);
+        }
+
+        .input-group button:active {
+            transform: translateY(0);
+        }
+
+        /* ─── Stats Card ─── */
+        #playerInfo {
+            margin-bottom: 1.8rem;
+        }
+
+        #playerInfo:not(:empty) {
+            animation: fadeSlideIn 0.4s ease-out;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.6rem;
+        }
+
+        .stat-card {
+            background: #1a1a20;
+            border: 1px solid #2a2a32;
+            border-radius: 12px;
+            padding: 1.2rem 1rem;
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #666;
+            margin-top: 0.3rem;
+        }
+
+        .stat-card.highlight {
+            border-color: #ff8c00;
+            background: linear-gradient(135deg, rgba(255, 140, 0, 0.08), rgba(255, 140, 0, 0.02));
+        }
+
+        .stat-card.highlight .stat-value {
+            color: #ff8c00;
+        }
+
+        /* ─── History Button ─── */
+        .history-actions {
+            text-align: center;
+            margin-bottom: 1rem;
+        }
+
+        #getOld {
+            padding: 0.7rem 2rem;
+            border: 1px solid #2a2a32;
+            border-radius: 10px;
+            background: transparent;
+            color: #aaa;
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.25s;
+            letter-spacing: 0.5px;
+        }
+
+        #getOld:hover {
+            border-color: #ff8c00;
+            color: #ff8c00;
+            background: rgba(255, 140, 0, 0.06);
+        }
+
+        /* ─── History List ─── */
+        #oldHistory:not(:empty) {
+            animation: fadeSlideIn 0.4s ease-out;
+        }
+
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1a20;
+            border: 1px solid #2a2a32;
+            border-radius: 10px;
+            padding: 0.9rem 1.2rem;
+            font-size: 0.85rem;
+            transition: border-color 0.2s;
+        }
+
+        .history-item:hover {
+            border-color: #3a3a46;
+        }
+
+        .history-item .steam-id {
+            color: #888;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+
+        .history-item .stats-badge {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .history-item .stats-badge span {
+            color: #ccc;
+        }
+
+        .history-item .stats-badge .kd {
+            color: #ff8c00;
+            font-weight: 600;
+        }
+
+        /* ─── Animations ─── */
+        @keyframes fadeSlideIn {
+            0% {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ─── Loading / Empty State ─── */
+        .empty-state {
+            text-align: center;
+            color: #555;
+            font-size: 0.85rem;
+            padding: 2rem 0;
+        }
+
+        .loading-dots::after {
+            content: '';
+            animation: dots 1.2s steps(3, end) infinite;
+        }
+
+        @keyframes dots {
+            0%   { content: ''; }
+            33%  { content: '.'; }
+            66%  { content: '..'; }
+            100% { content: '...'; }
+        }
+
+        /* ─── Footer ─── */
+        .footer {
+            margin-top: 2.5rem;
+            font-size: 0.75rem;
+            color: #333;
+            letter-spacing: 0.5px;
+        }
+
+        /* ─── Responsive ─── */
+        @media (max-width: 520px) {
+            .header h1 { font-size: 1.4rem; letter-spacing: 2px; }
+            .input-group { flex-direction: column; }
+            .input-group button { width: 100%; }
+            .stats-grid { grid-template-columns: repeat(3, 1fr); gap: 0.4rem; }
+            .stat-card .stat-value { font-size: 1.2rem; }
+            .history-item { flex-direction: column; gap: 0.4rem; align-items: flex-start; }
+        }
+    </style>
+</head>
 <body>
 
-    <form id="playerForm">
-        <input type="text" name="playerId" id="playerId" placeholder="Enter Player ID">
-        <button type="submit">Get Player Info</button>
-    </form>
-    <button id="getOld">Get History Of Searchs</button>
+    <div class="container">
 
+        <!-- Header -->
+        <div class="header">
+            <h1>CS:GO Stats</h1>
+            <p>Steam Player Statistics</p>
+        </div>
 
-    <div id="playerInfo"></div>
-    <div id="oldHistory"></div>
+        <!-- Search Card -->
+        <div class="search-card">
+            <label for="playerId">🔍 Steam ID</label>
+            <div class="input-group">
+                <input type="text" name="playerId" id="playerId" placeholder="Enter Steam ID..." autocomplete="off" />
+                <button type="submit" id="searchBtn">Search</button>
+            </div>
+        </div>
+
+        <!-- Player Stats -->
+        <div id="playerInfo"></div>
+
+        <!-- History -->
+        <div class="history-actions">
+            <button id="getOld">📋 View Search History</button>
+        </div>
+        <div id="oldHistory"></div>
+
+        <!-- Footer -->
+        <div class="footer">powered by Steam API</div>
+
+    </div>
+
     <script>
-        let playerForm = document.getElementById("playerForm");
+        const playerForm = document.getElementById("playerForm");
+        const searchBtn = document.getElementById("searchBtn");
         const historyBtn = document.getElementById("getOld");
+        const playerInfoEl = document.getElementById("playerInfo");
+        const oldHistoryEl = document.getElementById("oldHistory");
 
-        
+        // Search handler
+        async function searchPlayer() {
+            const playerId = document.getElementById("playerId").value.trim();
+            if (!playerId) return;
 
-        playerForm.addEventListener("submit",async function(e){
-                e.preventDefault()
-                const playerId = document.getElementById("playerId").value;
+            // Show loading state
+            playerInfoEl.innerHTML = `<div class="empty-state">Loading<span class="loading-dots"></span></div>`;
 
-                
-                const res = await fetch(`http://localhost:3001/api/stats/${playerId}`)
-                const data = await res.json()
-                console.log(data);
-                const stats = data.playerstats.stats
+            try {
+                const res = await fetch(`http://localhost:3001/api/stats/${playerId}`);
+                if (!res.ok) throw new Error('Player not found');
+                const data = await res.json();
+                const stats = data.playerstats.stats;
                 const kills = stats.find(s => s.name === "total_kills").value;
                 const deaths = stats.find(s => s.name === "total_deaths").value;
-//console.log(kills);
-                //console.log(deaths)
-                //console.log(stats);
+                const kd = (kills / deaths).toFixed(2);
 
-                
-
-                document.getElementById("playerInfo").innerHTML = `<h1>Player Kills: ${kills}</h1>    
-                                            <h1>Player Deaths: ${deaths}</h1>    
-                                            <h1>K/D: ${(kills / deaths).toFixed(2)}</h1>                        
-                
-                `
+                playerInfoEl.innerHTML = `
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-value">${kills.toLocaleString()}</div>
+                            <div class="stat-label">Kills</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-value">${deaths.toLocaleString()}</div>
+                            <div class="stat-label">Deaths</div>
+                        </div>
+                        <div class="stat-card highlight">
+                            <div class="stat-value">${kd}</div>
+                            <div class="stat-label">K/D Ratio</div>
+                        </div>
+                    </div>
+                `;
+            } catch (err) {
+                playerInfoEl.innerHTML = `<div class="empty-state" style="color:#ff5555;">⚠️ Player not found or API error</div>`;
             }
-        )
+        }
 
-        historyBtn.addEventListener("click",async function(e){
-            const res = await fetch(`http://localhost:3001/api/history`)
-            const data = await res.json()
-            console.log(data);
-            const rows = data.map(entry => ` <p>${entry.steamid} — Kills: ${entry.kills}, 
-                Deaths: ${entry.deaths}</p>
-                 `).join("");
-        document.getElementById("oldHistory").innerHTML = rows
-        })
-        
+        searchBtn.addEventListener("click", searchPlayer);
+        document.getElementById("playerId").addEventListener("keydown", (e) => {
+            if (e.key === "Enter") searchPlayer();
+        });
 
-        
-        
-   </script>
+        // History handler
+        historyBtn.addEventListener("click", async function() {
+            oldHistoryEl.innerHTML = `<div class="empty-state">Loading<span class="loading-dots"></span></div>`;
+
+            try {
+                const res = await fetch(`http://localhost:3001/api/history`);
+                const data = await res.json();
+
+                if (!data || data.length === 0) {
+                    oldHistoryEl.innerHTML = `<div class="empty-state">No search history yet</div>`;
+                    return;
+                }
+
+                const rows = data.map(entry => {
+                    const kd = entry.deaths > 0 ? (entry.kills / entry.deaths).toFixed(2) : '∞';
+                    return `
+                        <div class="history-item">
+                            <span class="steam-id">${entry.steamid}</span>
+                            <div class="stats-badge">
+                                <span>💀 ${entry.deaths}</span>
+                                <span>🔫 ${entry.kills}</span>
+                                <span class="kd">★ ${kd}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join("");
+
+                oldHistoryEl.innerHTML = `<div class="history-list">${rows}</div>`;
+            } catch (err) {
+                oldHistoryEl.innerHTML = `<div class="empty-state" style="color:#ff5555;">⚠️ Failed to load history</div>`;
+            }
+        });
+
+    </script>
+
 </body>
+</html>
